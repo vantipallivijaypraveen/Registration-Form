@@ -1,0 +1,150 @@
+Registration(jsp)
+
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Registration</title>
+</head>
+<body>
+<div class="box">
+    <div align="center">
+        <h1>Register Form</h1>
+    </div>
+    <div align="center">
+        <form action="registation" method="post">
+            <table>
+                <tr>
+                    <td>First Name :</td>
+                    <td>
+                        <input type="text" name="fnam" maxlength="20" size="15" required/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Last Name :</td>
+                    <td>
+                        <input type="text" name="lnam" maxlength="20" size="15" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>Email :</td>
+                    <td>
+                        <input type="email" name="email" maxlength="20" size="15" required/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Password :</td>
+                    <td>
+                        <input type="password" name="pwd" maxlength="20" size="15" required/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Re-Enter Password :</td>
+                    <td>
+                        <input type="password" name="epwd" maxlength="20" size="15" required/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Phone :</td>
+                    <td>
+                        <input type="number" name="phone" maxlength="10" size="15" required/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Gender :</td>
+                    <td>
+                        <input type="radio" name="gender" value="Male" />Male
+                        <input type="radio" name="gender" value="Female" />Female
+                    </td>
+                </tr>
+                <tr>
+                    <td>DOB:</td>
+                    <td><input type="date" name="dob" required ></td>
+                </tr>
+                <tr>
+                    <td>Address :</td>
+                    <td>
+                        <textarea name="addr" rows="5" cols="15" required></textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Submit</td>
+                    <td><input type="submit" value="register"></td>
+                </tr>
+            </table>
+        </form>
+    </div>
+</div>
+</body>
+</html>
+
+Registration(servlet)
+
+package avinash;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+public class registation extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+
+    public registation() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        PrintWriter out = response.getWriter();
+        String fnam = request.getParameter("fnam");
+        String lnam = request.getParameter("lnam");
+        String email = request.getParameter("email");
+        String pwd = request.getParameter("pwd");
+        String epwd = request.getParameter("epwd");
+        String phone = request.getParameter("phone");
+        String gender = request.getParameter("gender");
+        String dob = request.getParameter("dob");
+        String addr = request.getParameter("addr");
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/avinash", "root",
+                    "avinash7223");
+            PreparedStatement ps = con.prepareStatement("insert into register values(?,?,?,?,?,?,?,?,?)");
+            ps.setString(1, fnam);
+            ps.setString(2, lnam);
+            ps.setString(3, email);
+            ps.setString(4, pwd);
+            ps.setString(5, epwd);
+            ps.setString(6, phone);
+            ps.setString(7, gender);
+            ps.setString(8, dob);
+            ps.setString(9, addr);
+            int count = ps.executeUpdate();
+            if (count > 0) {
+                out.println("<h1 style='color:green'>User Registered Successfully</h1>");
+            } else {
+                out.println("<h1 style='color:red'>User Not Registered</h1>");
+            }
+            con.close();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            out.println("<h1 style='color:red'>User Not Registered</h1>");
+            out.println("<h1 style='color:red'>Error in ClassNotFoundException</h1>");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            out.println("<h1 style='color:red'>User Not Registered</h1>");
+            out.println("<h1 style='color:black'>Data Already Exist</h1>");
+            out.println("<p>Use Different mail</p>");
+        }
+    }
+}
